@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}GitHub Integration - {{ website.domain }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">GitHub Integration</h1>
+        
+        {% if website.github_repo %}
+            <div class="alert alert-info">
+                <strong>Currently connected to repository:</strong><br>
+                <a href="{{ website.github_repo }}" target="_blank">{{ website.github_repo }}</a>
+                {% if website.is_public_repo %}
+                    <span class="badge bg-success ms-2">Public</span>
+                {% else %}
+                    <span class="badge bg-secondary ms-2">Private</span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Connect to GitHub</button>
+                <a href="{% url 'dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </form>
+
+        <div class="mt-4">
+            <h4>Instructions:</h4>
+            <ol>
+                <li><strong>To create a new repository:</strong> Enter a repository name in the "Repo name" field (new repositories will be created as private)</li>
+                <li><strong>To use an existing repository:</strong> Select it from the "Existing repo" dropdown (this will override the repo name field)</li>
+                <li>Click "Connect to GitHub" to push your website files to the selected repository</li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const existingRepoSelect = document.getElementById('id_existing_repo');
+    const repoNameInput = document.getElementById('id_repo_name');
+    
+    if (existingRepoSelect && repoNameInput) {
+        existingRepoSelect.addEventListener('change', function() {
+            if (this.value) {
+                // If an existing repo is selected, clear the repo name field
+                repoNameInput.value = '';
+                repoNameInput.placeholder = 'Will use selected repository: ' + this.value;
+            } else {
+                // If no existing repo is selected, restore the placeholder
+                repoNameInput.placeholder = 'Enter a new repository name to create a new repository';
+            }
+        });
+    }
+});
+</script>
+{% endblock %} 

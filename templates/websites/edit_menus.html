@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Menus - {{ website.domain }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">Edit Menus for {{ website.domain }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            <h3>Header Menu</h3>
+            {{ header_form|crispy }}
+            <hr>
+            <h3>Footer Menu</h3>
+            {{ footer_form|crispy }}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save Menus</button>
+                <a href="{% url 'manage_pages' website.id %}" class="btn btn-secondary">Back to Pages</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

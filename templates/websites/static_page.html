@@ -1,0 +1,351 @@
+{% extends 'static_base.html' %}
+
+{% block extra_head %}
+  {% if global_schema %}
+    <script type="application/ld+json">{{ global_schema|safe }}</script>
+  {% endif %}
+  {% if per_page_schema %}
+    <script type="application/ld+json">{{ per_page_schema|safe }}</script>
+  {% endif %}
+{% endblock %}
+
+{% block title %}{{ page.title }} - {{ website.name }}{% endblock %}
+
+{% block hero %}
+<style>
+    .hero-section {
+        position: relative;
+        height: 500px;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        overflow: hidden;
+    }
+    .hero-background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hero-content {
+        background-color: rgba(20, 128, 138, 0.5); /* fallback for visual consistency */
+        padding: 2.5rem;
+        text-align: center;
+        width: 50%;
+        color: white;
+        border-radius: 0.25rem;
+    }
+    .hero-title {
+        font-size: 2.25rem;
+        line-height: 2.5rem;
+        font-weight: 800;
+    }
+    .hero-phone {
+        color: #fbbf24;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-top: 1rem;
+    }
+    @media (min-width: 768px) {
+        .hero-title {
+            font-size: 3rem;
+            line-height: 1;
+        }
+    }
+</style>
+<section class="hero-section">
+    <img src="/media/websites/title-background.jpg" alt="Title Background" class="hero-background-image" fetchpriority="high" loading="lazy">
+    <div class="hero-overlay">
+        <div class="hero-content" style="background-color: {{ website.header_box_rgba|default:'rgba(20, 128, 138, 0.5)' }};">
+            <h1 class="hero-title">{{ page.title }}</h1>
+            <p class="hero-phone"><a href="tel:{{ website.phone_number_link }}">{{ website.phone_number_display }}</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+{% block content %}
+<style>
+  .main-content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    /* Remove flex, use grid for content area */
+  }
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 2rem;
+    align-items: start;
+  }
+  .breadcrumbs {
+    margin-bottom: 1.5rem;
+    font-size: 14px;
+  }
+  .breadcrumbs ol {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+  }
+  .breadcrumbs li {
+    margin-right: 0.5em;
+  }
+  .breadcrumbs a {
+    text-decoration: none;
+    color: #14808a;
+  }
+  .breadcrumbs span {
+    color: #888;
+  }
+
+  .text-content {
+    /* No flex needed */
+  }
+
+  .contact-form-container {
+    background-color: #1e3a8a;
+    color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-sizing: border-box;
+  }
+  @media (max-width: 900px) {
+    .content-grid {
+      grid-template-columns: 1fr;
+    }
+    .contact-form-container {
+      margin-top: 2rem;
+    }
+  }
+
+  .contact-form-wrapper { color: white; }
+  .contact-form-title { font-size: 1.5rem; margin-bottom: 0.25rem; font-weight: bold; text-align: center; }
+  .bonus-note { text-align: center; margin-bottom: 1rem; font-size: 0.9rem; color: #facc15; }
+  .contact-form { display: flex; flex-direction: column; gap: 0.75rem; }
+  .contact-form label { font-weight: bold; font-size: 0.95rem; display: inline-block; }
+  .contact-form input[type="checkbox"] {
+    margin-left: 0.5rem;
+    width: 16px;
+    height: 16px;
+  }
+  .contact-form input[type="checkbox"]:focus {
+    outline: 2px solid #facc15;
+    outline-offset: 2px;
+  }
+  .contact-form input[type="tel"],
+  .contact-form input[type="email"],
+  .contact-form input[type="text"],
+  .contact-form select {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    color: #000;
+  }
+  .contact-form input:focus,
+  .contact-form select:focus {
+    outline: 2px solid #facc15;
+    outline-offset: 2px;
+  }
+  .contact-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+  }
+  .checkbox-group label { font-weight: normal; }
+  .name-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .name-group input { width: 100%; }
+  .submit-btn {
+    background-color: #facc15;
+    color: black;
+    padding: 0.75rem;
+    border: none;
+    font-weight: bold;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .required { color: red; }
+  .inline-img-left {
+    float: left;
+    margin: 0 1rem 1rem 0;
+    max-width: 45%;
+    height: auto;
+  }
+  .inline-img-right {
+    float: right;
+    margin: 0 0 1rem 1rem;
+    max-width: 45%;
+    height: auto;
+  }
+  .inline-img-center {
+    display: block;
+    margin: 1rem auto;
+    max-width: 100%;
+    height: auto;
+  }
+  .text-content p::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+
+
+
+<div class="main-content">
+  {% if page.breadcrumb %}
+    <nav class="breadcrumbs" aria-label="Breadcrumb" style="margin-bottom:1rem;font-size:14px;">
+      <span>
+        {% for crumb in page.breadcrumb %}
+          {% if forloop.first %}
+            <a href="{{ crumb.url }}">{{ website.domain }}</a>
+          {% else %}
+            / {% if crumb.exists %}<a href="{{ crumb.url }}">{{ crumb.title }}</a>{% else %}<span>{{ crumb.title }}</span>{% endif %}
+          {% endif %}
+        {% endfor %}
+      </span>
+    </nav>
+  {% endif %}
+  <article class="main-article">
+    <div class="content-grid">
+      <div class="text-content">
+        {% for para in page.paragraphs|slice:":6" %}
+          <p>{{ para|safe }}</p>
+        {% endfor %}
+      </div>
+      <div class="contact-form-container" style="background-color: {{ website.contact_box_color|default:'#24d16cff' }};">
+        <div class="contact-form-wrapper">
+          <h2 class="contact-form-title">{{ website.form_cta1|default:'FREE INSTANT QUOTE!' }}</h2>
+          <p class="bonus-note"><em>{{ website.form_cta2|default:'*plus FREE bonus coupon*' }}</em></p>
+          <form method="POST" action="https://api.web3forms.com/submit" class="contact-form" aria-label="Contact form" novalidate>
+            <input type="hidden" name="access_key" value="{{ website.WEB3_FORM_API_KEY }}">
+            <input type="hidden" name="subject" value="New Contact Form Submission">
+            <input type="hidden" name="from_name" value="{{ website.name }}">
+            <input type="hidden" name="redirect" value="/thank-you/">
+            <input type="hidden" name="message" id="web3forms-message">
+            {% csrf_token %}
+            <label for="service-needed">{{ website.form_question1|default_if_none:'What service do you need?' }} <span class="required">*</span></label>
+            <select name="service_needed" required id="service-needed" aria-describedby="service-help">
+              {% if website.form_options1 %}
+                {% for opt in website.form_options1 %}
+                  <option value="{{ opt }}">{{ opt }}</option>
+                {% endfor %}
+              {% else %}
+                {% for p in all_pages %}
+                  <option value="{{ p.title }}">{{ p.title }}</option>
+                {% endfor %}
+              {% endif %}
+            </select>
+            <label for="area-checkbox-group">{{ website.form_question2|default_if_none:'How many square feet?' }} <span class="required">*</span></label>
+            <div class="checkbox-group" id="area-checkbox-group" role="group" aria-labelledby="area-checkbox-group">
+              {% if website.form_options2 %}
+                {% for opt in website.form_options2 %}
+                  <label for="area-{{ forloop.counter }}"> {{ opt }}</label>
+                  <input type="checkbox" name="area" value="{{ opt }}" id="area-{{ forloop.counter }}"><br>
+                {% endfor %}
+              {% else %}
+                <label for="area-less-300"> Less than 300</label><input type="checkbox" name="area" value="Less than 300" id="area-less-300"><br>
+                <label for="area-300-500">Between 300–500</label><input type="checkbox" name="area" value="Between 300-500" id="area-300-500"> <br>
+                <label for="area-more-500">More than 500</label><input type="checkbox" name="area" value="More than 500" id="area-more-500">
+              {% endif %}
+            </div>
+            <div class="name-group">
+              <label for="first-name">First Name <span class="required">*</span></label>
+              <input type="text" name="first_name" placeholder="First" required id="first-name">
+              <label for="last-name">Last Name <span class="required">*</span></label>
+              <input type="text" name="last_name" placeholder="Last" required id="last-name">
+            </div>
+            <label for="phone">{{ website.form_phone_label }} <span class="required">*</span></label>
+            <input type="tel" name="phone" required id="phone">
+            <label for="email">{{ website.form_email_label }} <span class="required">*</span></label>
+            <input type="email" name="email" required id="email">
+            <button type="submit" class="submit-btn">{{ website.form_quote_button|default:'Get Quote!' }}</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="full-width-content" style="width:100%;margin-top:2rem;">
+      {% for para in page.paragraphs|slice:"6:" %}
+        <p>{{ para|safe }}</p>
+      {% endfor %}
+      {% if website.author %}
+        {% if website.author.logo %}
+          <div class="author-box" style="display:flex;align-items:flex-start;margin-top:2.5rem;padding:1.5rem 1rem;background:#f8fafc;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.04);gap:1.5rem;max-width:600px;">
+            <img src="{{ website.author.logo }}" alt="{{ website.author.name }} Logo" style="width:80px;height:80px;object-fit:cover;border-radius:50%;flex-shrink:0;">
+            <div style="flex:1;">
+              <div style="font-size:1.25rem;font-weight:700;line-height:1.2;margin-bottom:0.25rem;">
+                <a href="{{ website.author.url|default:'/' }}" style="color:#14808a;text-decoration:underline;" {% if website.author.url %}target="_blank"{% endif %}>{{ website.author.name }}</a>
+              </div>
+              <div style="font-size:1rem;color:#444;">{{ website.author.description }}</div>
+            </div>
+          </div>
+        {% else %}
+          <div class="author-box" style="display:flex;align-items:flex-start;margin-top:2.5rem;padding:1.5rem 1rem;background:#f8fafc;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.04);gap:1.5rem;max-width:600px;">
+            <div style="flex:1;">
+              <div style="font-size:1.25rem;font-weight:700;line-height:1.2;margin-bottom:0.25rem;">
+                <a href="{{ website.author.url|default:'/' }}" style="color:#14808a;text-decoration:underline;" {% if website.author.url %}target="_blank"{% endif %}>{{ website.author.name }}</a>
+              </div>
+              <div style="font-size:1rem;color:#444;">{{ website.author.description }}</div>
+            </div>
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+  </article>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector(".contact-form");
+    if (form) {
+      form.addEventListener("submit", function () {
+        const service = form.querySelector('[name="service_needed"]').value;
+        const areaNodes = form.querySelectorAll('[name="area"]:checked');
+        let area = Array.from(areaNodes).map(cb => cb.value).join(", ");
+        if (!area) area = "None selected";
+        const firstName = form.querySelector('[name="first_name"]').value;
+        const lastName = form.querySelector('[name="last_name"]').value;
+        const phone = form.querySelector('[name="phone"]').value;
+        const email = form.querySelector('[name="email"]').value;
+        const message =
+          `What kind of service do you need?\nAnswer - ${service}\n\n` +
+          `Select area -\nAnswer - ${area}\n\n` +
+          `Name -\nAnswer - ${firstName} ${lastName}\n\n` +
+          `Phone -\nAnswer - ${phone}\n\n` +
+          `Email -\nAnswer - ${email}`;
+        form.querySelector('#web3forms-message').value = message;
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+{% block form %}
+{# This block is now empty because the form is integrated into the content block #}
+{% endblock %} 

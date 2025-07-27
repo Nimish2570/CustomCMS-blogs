@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Tracking Settings - {{ website.domain }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">Tracking Settings for {{ website.domain }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.google_search_console_tag|as_crispy_field }}
+            {{ form.google_tag|as_crispy_field }}
+            {{ form.google_analytics|as_crispy_field }}
+            {{ form.meta_facebook_pixel|as_crispy_field }}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save Tracking Settings</button>
+                <a href="{% url 'manage_pages' website.id %}" class="btn btn-secondary">Back to Pages</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

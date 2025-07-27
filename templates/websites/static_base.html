@@ -1,0 +1,384 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    {% if website.google_search_console_tag and not is_search_bot %}
+        <meta name="google-site-verification" content="{{ website.google_search_console_tag }}">
+    {% endif %}
+
+    <title>{% block title %}{{ page.title }} - {{ website.name }}{% endblock %}</title>
+
+    <meta name="description" content="{{ page.meta_description|default:'Your default website description here.' }}">
+
+    {% if website.favicon %}
+      <link rel="icon" type="image/png" href="{{ website.favicon }}">
+    {% elif website.logo %}
+      <link rel="icon" type="image/png" href="{{ website.logo }}">
+    {% endif %}
+
+    <link rel="preload" as="image" href="/media/websites/title-background.jpg" fetchpriority="high">
+
+    {% block extra_head %}{% endblock %}
+
+    {% if website.google_tag and not is_search_bot %}
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ website.google_tag }}"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '{{ website.google_tag }}');
+        </script>
+    {% endif %}
+
+    {% if website.meta_facebook_pixel and not is_search_bot %}
+        <script>
+            !function(f,b,e,v,n,t,s){
+                if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', '{{ website.meta_facebook_pixel }}');
+            fbq('track', 'PageView');
+        </script>
+        <noscript>
+            <img height="1" width="1" style="display:none"
+                 src="https://www.facebook.com/tr?id={{ website.meta_facebook_pixel }}&ev=PageView&noscript=1"
+                 alt="Facebook Pixel" loading="lazy"/>
+        </noscript>
+    {% endif %}
+
+    <style>
+        /* Base styles (desktop first) */
+        .nav-link {
+            text-transform: uppercase;
+            padding: 1rem;
+            font-weight: 600;
+            color: #4B5563;
+            white-space: nowrap;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: #000;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 160px;
+            z-index: 50;
+        }
+
+        .dropdown-content a {
+            padding: 10px 16px;
+            display: block;
+            color: #111;
+            text-decoration: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #f3f4f6;
+        }
+
+        .dropdown.active .dropdown-content {
+            display: block;
+        }
+
+        .nav-divider {
+            height: 3px;
+            background-color: #5b5b5c;
+            width: 400px;
+            margin: 0 1rem;
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .mobile-nav-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Responsive (mobile first enhancements) */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                align-items: flex-start;
+                display: none;
+                width: 100%;
+            }
+
+            .nav-container.active {
+                display: flex;
+                background-color: white;
+                padding: 1rem 0;
+                border-top: 1px solid #e5e7eb;
+            }
+
+            .nav-divider {
+                display: none;
+            }
+
+            .nav-link {
+                padding: 0.75rem 1rem;
+                width: 100%;
+            }
+
+            .dropdown-content {
+                position: static;
+                box-shadow: none;
+                display: block;
+            }
+
+            .dropdown-content a {
+                padding-left: 2rem;
+            }
+
+            .dropdown .nav-link span {
+                display: inline-block;
+                width: 100%;
+            }
+
+            .mobile-nav-toggle {
+                display: inline-block;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="bg-white shadow-sm">
+    <nav class="container mx-auto px-6 py-4 relative">
+        <div class="flex justify-between items-center">
+            <button class="mobile-nav-toggle" id="mobileToggle">☰</button>
+        </div>
+        <div class="nav-container" id="mainNav">
+            <div class="nav-divider"></div>
+            {% for item in header_menu.links %}
+                {% if item.children %}
+                    <div class="relative dropdown">
+                        <span class="nav-link">{{ item.title }} <span class="ml-1">▼</span></span>
+                        <div class="dropdown-content">
+                            {% for child in item.children %}
+                                <a href="{{ child.url }}">{{ child.title }}</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{{ item.url }}" class="nav-link">{{ item.title }}</a>
+                {% endif %}
+            {% endfor %}
+            <div class="nav-divider"></div>
+        </div>
+    </nav>
+</header>
+
+
+<!-- Hero Block -->
+{% block hero %}{% endblock %}
+
+<!-- Main Content -->
+<main class="container py-4" id="main-content">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Phone Banner -->
+<style>
+    .phone-banner {
+        width: 100vw;
+        background-color: #174d78;
+        text-align: center;
+        padding: 2rem 1rem;
+        color: white;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .phone-link {
+        font-size: 2rem;
+        font-weight: bold;
+        text-decoration: none;
+        color: yellow;
+        text-shadow: 1px 1px #000;
+        display: inline-block;
+        border-bottom: 3px solid yellow;
+    }
+
+    .phone-subtext {
+        display: block;
+        margin-top: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .phone-link {
+            font-size: 1.5rem;
+        }
+
+        .phone-subtext {
+            font-size: 1rem;
+        }
+    }
+</style>
+<div class="phone-banner" style="background-color: {{ website.phone_banner_bg_color|default:'#174d78' }};">
+    <a href="tel:{{ website.phone_number_link }}" class="phone-link">
+        {{ website.phone_number_display }}
+        {% if website.footer_phone_cta %}
+            <span class="phone-subtext">{{ website.footer_phone_cta }}</span>
+        {% endif %}
+    </a>
+</div>
+
+<!-- Footer -->
+<style>
+    .footer {
+        background-color: #f3f4f6;
+        color: #1f2937;
+        padding: 2rem 0;
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .footer-container {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 0 1rem;
+        text-align: center;
+    }
+
+    .footer-content {
+        margin-bottom: 1.5rem;
+        font-style: italic;
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .footer-link {
+        color: #ed8c0eeb;
+        text-decoration: none;
+    }
+
+    .footer-link:hover {
+        color: #111827;
+    }
+
+    .footer-social-media {
+        margin-top: 1.5rem;
+    }
+
+    .footer-social-link {
+        margin: 0 0.5rem;
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: underline;
+        transition: color 0.2s;
+    }
+
+    .footer-social-link:hover {
+        color: #ed8c0e;
+        text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+        .footer-links {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-social-link {
+            display: block;
+            margin: 0.25rem 0;
+        }
+    }
+</style>
+
+<footer class="footer">
+    <div class="footer-container">
+        {% if footer %}
+            <div class="footer-content">
+                {% if website.footer_legal_disclaimer %}
+                    <p>{{ website.footer_legal_disclaimer }}</p>
+                {% endif %}
+                {% for p in footer.paragraphs %}
+                    <p>{{ p }}</p>
+                {% endfor %}
+            </div>
+            <div class="footer-links">
+                {% for item in footer.links %}
+                    <a href="{{ item.url }}" class="footer-link">{{ item.title }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if website.social_links %}
+            <div class="footer-social-media mt-3">
+                <p><strong>Follow us:</strong></p>
+                {% for item in website.social_links %}
+                    <a href="{{ item.url }}" target="_blank" class="footer-link footer-social-link">{{ item.title }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</footer>
+
+<script>
+    // Mobile nav toggle
+    document.getElementById('mobileToggle').addEventListener('click', function () {
+        document.getElementById('mainNav').classList.toggle('active');
+    });
+
+    // Dropdown toggle
+    document.querySelectorAll('.dropdown .nav-link').forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const dropdown = link.closest('.dropdown');
+
+            document.querySelectorAll('.dropdown').forEach(function (el) {
+                if (el !== dropdown) el.classList.remove('active');
+            });
+
+            dropdown.classList.toggle('active');
+        });
+    });
+
+    // Close dropdowns if clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.dropdown')) {
+            document.querySelectorAll('.dropdown').forEach(function (dropdown) {
+                dropdown.classList.remove('active');
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

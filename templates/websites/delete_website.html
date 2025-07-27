@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Website - {{ website.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Delete Website</h4>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Are you sure you want to delete the website "{{ website.name }}"?</p>
+                    <p class="text-danger">This action cannot be undone. All pages and content associated with this website will be permanently deleted.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-danger">Delete Website</button>
+                            <a href="{% url 'website_detail' website.id %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

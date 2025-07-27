@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}General Site Settings - {{ website.domain }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">General Site Settings for {{ website.domain }}</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.domain|as_crispy_field }}
+            {{ form.phone_number_display|as_crispy_field }}
+            {{ form.phone_number_link|as_crispy_field }}
+            {{ form.logo|as_crispy_field }}
+            {{ form.favicon|as_crispy_field }}
+            {{ form.robots_txt|as_crispy_field }}
+            {{ form.github_repo|as_crispy_field }}
+            {{ form.is_public_repo|as_crispy_field }}
+            {{ form.heading_background_image|as_crispy_field }}
+            {{ form.footer_phone_cta|as_crispy_field }}
+            {{ form.footer_legal_disclaimer|as_crispy_field }}
+            {{ form.social_media_box|as_crispy_field }}
+            {{ form.header_box_color|as_crispy_field }} {# Help text: Use a hex value, e.g. #14808a #}
+            {{ form.phone_banner_bg_color|as_crispy_field }}
+            {{ form.contact_box_color|as_crispy_field }}
+            <div class="mb-3">
+                <a href="{% url 'tracking_settings' website.id %}" class="btn btn-outline-primary mb-2">Tracking Settings</a>
+                <a href="{% url 'form_settings' website.id %}" class="btn btn-outline-primary mb-2">Form Settings</a>
+            </div>
+            <div class="mb-3">
+                {{ form.global_seo_schema.label_tag }}
+                {{ form.global_seo_schema }}
+                {% if form.global_seo_schema.help_text %}
+                    <small class="form-text text-muted">{{ form.global_seo_schema.help_text }}</small>
+                {% endif %}
+                {% for error in form.global_seo_schema.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+                <a href="{% url 'manage_pages' website.id %}" class="btn btn-secondary">Back to Pages</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

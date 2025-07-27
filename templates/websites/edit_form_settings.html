@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Form Settings - {{ website.domain }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h1 class="mb-4">Form Settings for {{ website.domain }}</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.form_cta1|as_crispy_field }}
+            {{ form.form_cta2|as_crispy_field }}
+            {{ form.form_question1|as_crispy_field }}
+            {{ form.form_options1|as_crispy_field }}
+            {{ form.form_question2|as_crispy_field }}
+            {{ form.form_options2|as_crispy_field }}
+            {{ form.form_quote_button|as_crispy_field }}
+            {{ form.form_name_label|as_crispy_field }}
+            {{ form.form_phone_label|as_crispy_field }}
+            {{ form.form_email_label|as_crispy_field }}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save Form Settings</button>
+                <a href="{% url 'manage_pages' website.id %}" class="btn btn-secondary">Back to Pages</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 
